@@ -1,9 +1,11 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
 
+
 # Create your views here.
 from .models import GuessNumbers
 from .forms import PostForm
+from .crawling import getLast, checkLast
 
 def index(request):
     lottos = GuessNumbers.objects.all()
@@ -24,3 +26,9 @@ def post(request):
 def detail(request, lottokey):
     lotto = GuessNumbers.objects.get(pk = lottokey)
     return render(request, "lotto/detail.html", {"lotto": lotto})
+
+def crawling(request):
+    last_time = getLast()
+    dblast_time = checkLast()
+
+    return render(request, 'lotto/crawling.html',{"last_time":last_time, "dblast_time":dblast_time})
