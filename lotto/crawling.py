@@ -163,12 +163,10 @@ def crawler(fromPos,toPos):
         info["금액"] = amount
 
         lotto_list.append(info)
+    return lotto_list
 
-def insert():
-    #pwd = 'rlaehgus1'
-    #engine = create_engine('+connector://root:'+pwd+'@localhost/lotto', echo=False)
-    #connector = engine.connect()
 
+def insert(lotto_list):
     for dic in lotto_list:
         count = dic["회차"]
         numbers = dic["번호"]
@@ -182,14 +180,15 @@ def insert():
         green = 0  # 31~40
         gray = 0  # 41 ~ 45
         band = 0  #숫자 밴드 카운트
+        one_continue = 0
+        two_continue = 0
+        three_continue = 0
+        four_continue = 0
         winNumbers = []
-        lotto_continue = 0
-        lotto_2continue = 0
-        lotto_3continue = 0
-        lotto_4continue = 0
 
-        print("insert to database at " + str(count))
+        #print("insert to database at " + str(count))
         numberlist = str(numbers).split(",")
+        print ("numberlist",numberlist)
 
         winNumbers.append(int(numberlist[0]))
         winNumbers.append(int(numberlist[1]))
@@ -234,48 +233,48 @@ def insert():
         #continure number 구하기
         #1 연번
         if (winNumbers[1] - winNumbers[0] == 1):
-            lotto_continue += 1
+            one_continue += 1
         elif (winNumbers[2] - winNumbers[1] == 1):
-            lotto_continue += 1
+            one_continue += 1
         elif (winNumbers[3] - winNumbers[2] == 1):
-            lotto_continue += 1
+            one_continue += 1
         elif (winNumbers[4] - winNumbers[3] == 1):
-            lotto_continue += 1
+            one_continue += 1
         elif (winNumbers[5] - winNumbers[4] == 1):
-            lotto_continue += 1
+            one_continue += 1
 
         #2 연번
         if (winNumbers[2] - winNumbers[0] == 2):
-            lotto_2continue += 1
-            lotto_continue -= 1
+            two_continue += 1
+            one_continue -= 1
         elif (winNumbers[3] - winNumbers[1] == 2):
-            lotto_2continue += 1
-            lotto_continue -= 1
+            two_continue += 1
+            one_continue -= 1
         elif (winNumbers[4] - winNumbers[2] == 2):
-            lotto_2continue += 1
-            lotto_continue -= 1
+            two_continue += 1
+            one_continue -= 1
         elif (winNumbers[5] - winNumbers[3] == 2):
-            lotto_2continue += 1
-            lotto_continue -= 1
+            two_continue += 1
+            one_continue -= 1
 
         #3 연번
         if (winNumbers[3] - winNumbers[0] == 3):
-            lotto_3continue += 1
-            lotto_2continue -= 1
+            three_continue += 1
+            two_continue -= 1
         elif (winNumbers[4] - winNumbers[1] == 3):
-            lotto_3continue += 1
-            lotto_2continue -= 1
+            three_continue += 1
+            two_continue -= 1
         elif (winNumbers[5] - winNumbers[2] == 3):
-            lotto_3continue += 1
-            lotto_2continue -= 1
+            three_continue += 1
+            two_continue -= 1
 
         #4 연번
         if (winNumbers[4] - winNumbers[0] == 4):
-            lotto_4continue += 1
-            lotto_3continue += 1
+            four_continue += 1
+            three_continue += 1
         elif (winNumbers[5] - winNumbers[1] == 4):
-            lotto_4continue += 1
-            lotto_3continue += 1
+            four_continue += 1
+            three_continue += 1
 
         #끝자리수 횟수 확인
         ending_digit = []
@@ -294,39 +293,31 @@ def insert():
         unique_elements, counts_elements = np.unique(ending_digit, return_counts=True)
         max_ending_digit_count = int(max(counts_elements))  # max count
 
-        # 아래 코드를 사용하면 sql문 에러 발생으로 시행되지 않음
-        # sql = "INSERT INTO winlotto (count, 1, 2, 3, 4, 5, 6, 7, persons, amounts)\
-        #        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
-        # connector.execute(sql, count, i1, i2, i3, i4, i5, i6, 7, persons, amounts)
+       # if a model has an AutoField but you want to define a new object's ID
+        insert_data = nums(id=count,
+                          count=count,
+                          one = winNumbers[0],
+                          two = winNumbers[1],
+                          three = winNumbers[2],
+                          four = winNumbers[3],
+                          five = winNumbers[4],
+                          six = winNumbers[5],
+                          bonus = winNumbers[6],
+                          person = persons,
+                          amount = amounts,
+                          total = total,
+                          odd = odd,
+                          even = even,
+                          yellow = yellow,
+                          blue = blue,
+                          red = red,
+                          green = green,
+                          gray = gray,
+                          band = band,
+                          one_continue = one_continue,
+                          two_continue = two_continue,
+                          three_continue = three_continue,
+                          four_continue = four_continue,
+                          end_digit = max_ending_digit_count)
+        insert_data.save()
 
-
-        # sql문 생성시 table name 으로 표기함.
-        sql = "INSERT INTO winlotto VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
-
-        try:
-            connector.execute(sql, count,winNumbers[0], winNumbers[1],winNumbers[2],winNumbers[3],winNumbers[4],\
-            winNumbers[5],winNumbers[6],persons, amounts, total, odd, even,yellow, blue, red, green, gray, band,\
-                              lotto_continue, lotto_2continue, lotto_3continue, lotto_4continue, max_ending_digit_count)
-        except Exception as err:
-            print(str(err))
-            break
-
-#connector.close()
-
-
-def main():
-    # 최신 추첨 회차 확인
-    last_time = getLast()
-    dblast_time = checkLast()
-
-    #신규 회차확인시 크롤링
-    if dblast_time < last_time:
-        print("최신 회차는 " + str(last_time) + " 회 이며, 데이터베이스에는 " + str(dblast_time) + "회 까지 저장되어 있습니다.")
-        print("업데이트를 시작합니다.")
-        crawler(dblast_time, last_time)
-
-    #신규 회차 있을때 db update
-    if len(lotto_list) > 0:
-        insert()
-
-#if __name__ == "__main__":
