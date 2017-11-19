@@ -27,6 +27,7 @@ class GuessNumbers(models.Model):
 
 class nums(models.Model):
     count = models.IntegerField()
+    shotDate = models.DateField()
     one = models.IntegerField()
     two = models.IntegerField()
     three = models.IntegerField()
@@ -52,4 +53,4 @@ class nums(models.Model):
     end_digit = models.IntegerField()
 
     def __str__(self):
-        return "%s %s" % (self.name, self.text)
+        return "%s %s" % (self.count, self.person)

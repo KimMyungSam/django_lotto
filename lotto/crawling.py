@@ -91,12 +91,10 @@ from bs4 import BeautifulSoup
 import numpy as np
 import pandas as pd
 import random
+from datetime import datetime
 
 from .models import nums
 from django.db.models import Max
-
-#웹 크롤링 한 결과를 저장할 리스트
-lotto_list = []
 
 #로또 웹 사이트의 첫 주소
 main_url = "http://www.nlotto.co.kr/gameResult.do?method=byWin"
@@ -120,10 +118,13 @@ def getLast():
 def checkLast():
     last = nums.objects.all().aggregate(Max('count'))
     if last['count__max'] is None:
-        last['count__max'] = 0
+        last['count__max'] = 1
     return last['count__max']
 
 def crawler(fromPos,toPos):
+    #웹 크롤링 한 결과를 저장할 리스트
+    lotto_list = []
+
     for i in range(fromPos,toPos + 1):
         crawler_url = basic_url + str(i)
 
@@ -136,31 +137,48 @@ def crawler(fromPos,toPos):
         img_number = p_data[0].find_all('img')
         '''
         line = str(soup.find("meta", {"id" : "desc", "name" : "description"})['content'])
-        print("당첨회차: " + str(i))
+        div_data = soup.find_all('div', class_='lotto_win_number mt12')
+        span_data = str(div_data[0].find('span'))
+        begin = span_data.find("(") + 1
+        end = span_data.find("추첨")
+        date = span_data[begin:end]
+        date = date.split()
+        end = date[0].find("년")
+        dateY = date[0][:end]
+        end = date[1].find("월")
+        dateM = date[1][:end]
+        end = date[2].find("일")
+        dateD = date[2][:end]
+        dateStr = dateY+'-'+dateM+'-'+dateD
+        date = datetime.strptime(dateStr,'%Y-%m-%d')
+        print ('\n date_data = ')
+        print (date)
+        #print("당첨회차: " + str(i))
 
         begin = line.find("당첨번호")
         begin = line.find(" ", begin) + 1
         end = line.find(".", begin)
         numbers = line[begin:end]
-        print("당첨번호: " + numbers)
+        #print("당첨번호: " + numbers)
 
         begin = line.find("총")
         begin = line.find(" ", begin) + 1
         end = line.find("명", begin)
         persons = line[begin:end]
-        print("당첨인원: " + persons)
+        #print("당첨인원: " + persons)
 
         begin = line.find("당첨금액")
         begin = line.find(" ", begin) + 1
         end = line.find("원", begin)
         amount = line[begin:end]
-        print("당첨금액: " + amount)
+        #print("당첨금액: " + amount)
 
         info = {}
         info["회차"] = i
         info["번호"] = numbers
         info["당첨자"] = persons
         info["금액"] = amount
+        info["날짜"] = date
 
         lotto_list.append(info)
     return lotto_list
@@ -172,6 +190,7 @@ def insert(lotto_list):
         numbers = dic["번호"]
         persons = dic["당첨자"]
         amounts = dic["금액"]
+        date = dic["날짜"]
         odd = 0  # 홀수
         even = 0  # 짝수
         yellow = 0  # 1~10
@@ -294,8 +313,9 @@ def insert(lotto_list):
         max_ending_digit_count = int(max(counts_elements))  # max count
 
        # if a model has an AutoField but you want to define a new object's ID
-        insert_data = nums(id=count,
-                          count=count,
+        insert_data = nums(id = count,
+                          count = count,
+                          shotDate = date,
                           one = winNumbers[0],
                           two = winNumbers[1],
                           three = winNumbers[2],
@@ -320,4 +340,3 @@ def insert(lotto_list):
                           four_continue = four_continue,
                           end_digit = max_ending_digit_count)
         insert_data.save()
-
