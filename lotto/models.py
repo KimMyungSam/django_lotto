@@ -1,31 +1,24 @@
 from django.db import models
-
 from django.utils import timezone
 import random
+import pandas as pd
+
 # Create your models here.
-class GuessNumbers(models.Model):
+class ShootNumbers(models.Model):
     name = models.CharField(max_length = 24)
-    lottos = models.CharField(max_length = 255, default = '[1,2,3,4,5,6]')
+    # lottos = models.CharField(max_length = 255, default = '[1,2,3,4,5,6]')
+    lottos = models.TextField(default = '[1,2,3,4,5,6]')
     text = models.CharField(max_length = 24)
-    num_lotto = models.IntegerField(default = 5)
+    shoot_lotto = models.IntegerField(default = 5)
     update_date = models.DateTimeField()
 
-    # 로또 번호 생성 및 데이터베이스 저장
-    def generate(self):
-        self.lottos = ""
-        origin = list(range(1,46))
-        for _ in range(0, self.num_lotto):
-            random.shuffle(origin)
-            guess = origin[:6]
-            guess.sort()
-            self.lottos += str(guess) +'\n'
-        self.update_date = timezone.now()
-        self.save()
+    class Meta:
+        ordering = ['-update_date']
 
     def __str__(self):
         return "%s %s" % (self.name, self.text)
 
-class nums(models.Model):
+class DecidedNumbers(models.Model):
     count = models.IntegerField()
     shotDate = models.DateField()
     one = models.IntegerField()
@@ -52,5 +45,11 @@ class nums(models.Model):
     four_continue = models.IntegerField()
     end_digit = models.IntegerField()
 
+    class Meta:
+        indexes = [
+            models.Index(fields=['shotDate'])
+        ]
+
     def __str__(self):
-        return "%s %s" % (self.count, self.person)
+        return "%s %s %s %s %s %s %s %s %s %s"\
+        %(self.count, self.shotDate, self.one, self.two, self.three, self.four, self.five, self.six, self.total, self.band)

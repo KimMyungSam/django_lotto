@@ -93,7 +93,7 @@ import pandas as pd
 import random
 from datetime import datetime
 
-from .models import nums
+from .models import DecidedNumbers
 from django.db.models import Max
 
 #로또 웹 사이트의 첫 주소
@@ -116,7 +116,7 @@ def getLast():
     return int(line[begin + 1 : end])
 
 def checkLast():
-    last = nums.objects.all().aggregate(Max('count'))
+    last = DecidedNumbers.objects.all().aggregate(Max('count'))
     if last['count__max'] is None:
         last['count__max'] = 1
     return last['count__max']
@@ -313,7 +313,7 @@ def insert(lotto_list):
         max_ending_digit_count = int(max(counts_elements))  # max count
 
        # if a model has an AutoField but you want to define a new object's ID
-        insert_data = nums(id = count,
+        insert_data = DecidedNumbers(id = count,
                           count = count,
                           shotDate = date,
                           one = winNumbers[0],

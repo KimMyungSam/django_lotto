@@ -1,8 +1,8 @@
 from django import forms
-from .models import GuessNumbers
+from .models import ShootNumbers
 
-class PostForm(forms.ModelForm):
+class LottoForm(forms.ModelForm):
 
     class Meta:
-        model = GuessNumbers
-        fields = ('name', 'text',)
+        model = ShootNumbers
+        fields = ('name', 'text', 'shoot_lotto')

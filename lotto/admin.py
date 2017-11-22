@@ -1,5 +1,15 @@
 from django.contrib import admin
 
-from .models import GuessNumbers
+from .models import ShootNumbers, DecidedNumbers
+
 # Register your models here.
-admin.site.register(GuessNumbers)
+@admin.register(ShootNumbers)
+class ShootNumbersAdmin(admin.ModelAdmin):
+    list_display = ['name', 'text']
+    list_per_page = 20
+
+@admin.register(DecidedNumbers)
+class DecidedNumbersAdmin(admin.ModelAdmin):
+    list_display = ['count', 'shotDate', 'one', 'two', 'three','four','five','six', 'total', 'band']
+    list_per_page = 20
+    list_filter = ['band','count']

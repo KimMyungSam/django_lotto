@@ -1,20 +1,16 @@
 {% extends 'lotto/base.html' %}
 
-{% block title %}{% endblock %}
+{% block title %}list numbers{% endblock %}
 
 {% block content %}
-  <div class="lotto">
-    {% if lotto.update_date %}
-      <p> {{lotto.update_date}}</p>
-    {% endif %}
-    <h2>{{lotto.text}}</h2>
-    <p> by {{lotto.name}}</p>
+  {% for lotto in lottos %}
+    <h2><a href="{% url 'detail' lottokey=lotto.pk %}">{{lotto.text}}</a></h2>
+    <p> {{lotto.update_date}}</p>
     <p> {{lotto.lottos|linebreaksbr}}</p>
-  </div>
-  
+  {% endfor %}
+
   <form action="." method="post">
     {% csrf_token %}
     <input type="submit" value="OK">
   </form>
-
 {% endblock %}
