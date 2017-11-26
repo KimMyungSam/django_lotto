@@ -6,7 +6,6 @@ from django.http import HttpResponse
 from .models import ShootNumbers
 from .forms import LottoForm
 from .crawling import getLast, checkLast, crawler, insert
-from .shooting import generate
 
 def index(request):
     lottos = ShootNumbers.objects.all()
@@ -24,8 +23,8 @@ def post(request):
         form = LottoForm(request.POST)
         if form.is_valid():
             lotto = form.save(commit = False)
-            # lotto.generate()
-            generate()
+            lotto.generate()
+            # generate()  # shooting.generate 실행
             return redirect('index')
     else:
         form = LottoForm()

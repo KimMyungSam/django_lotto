@@ -5,4 +5,4 @@ class LottoForm(forms.ModelForm):
 
     class Meta:
         model = ShootNumbers
-        fields = ('name', 'text', 'shoot_lotto')
+        fields = ('shooter', 'shoot_lotto')

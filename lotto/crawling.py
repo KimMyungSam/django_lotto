@@ -338,5 +338,6 @@ def insert(lotto_list):
                           two_continue = two_continue,
                           three_continue = three_continue,
                           four_continue = four_continue,
-                          end_digit = max_ending_digit_count)
+                          end_digit = max_ending_digit_count
+                      )
         insert_data.save()
