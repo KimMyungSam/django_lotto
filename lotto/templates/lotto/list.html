@@ -4,7 +4,7 @@
 
 {% block content %}
   {% for lotto in lottos %}
-    <h2><a href="{% url 'detail' lottokey=lotto.pk %}">{{lotto.text}}</a></h2>
+    <h2><a href="{% url 'detail' lottokey=lotto.pk %}">{{lotto.shooter}}</a></h2>
     <p> {{lotto.update_date}}</p>
     <p> {{lotto.lottos|linebreaksbr}}</p>
   {% endfor %}

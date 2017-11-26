@@ -1,5 +1,4 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.http import HttpResponse
 # from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 # Create your views here.
@@ -24,7 +23,6 @@ def post(request):
         if form.is_valid():
             lotto = form.save(commit = False)
             lotto.generate()
-            # generate()  # shooting.generate 실행
             return redirect('index')
     else:
         form = LottoForm()

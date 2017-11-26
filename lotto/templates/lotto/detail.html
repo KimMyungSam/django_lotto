@@ -7,11 +7,17 @@
     {% if lotto.update_date %}
       <p> {{lotto.update_date}}</p>
     {% endif %}
-    <h2>{{lotto.text}}</h2>
-    <p> by {{lotto.name}}</p>
-    <p> {{lotto.lottos|linebreaksbr}}</p>
+    <p> by {{lotto.shooter}}</p>
+    <p> lotto:{{lotto.lottos}}</p>
+    <p>shot_count:{{lotto.shot_count}}</p>
+    <p>predict_total_value:{{lotto.predict_total_value}}</p>
+    <p>predict_total_25:{{lotto.predict_total_25}}</p>
+    <p>predict_total_75:{{lotto.predict_total_75}}</p>
+    <p>origin_nums:{{lotto.origin_nums}}</p>
+    <p>except_nums:{{lotto.except_nums}}</p>
+    <p>band:{{lotto.band}}</p>
   </div>
-  
+
   <form action="." method="post">
     {% csrf_token %}
     <input type="submit" value="OK">
