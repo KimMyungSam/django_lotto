@@ -1,8 +1,8 @@
 from django import forms
-from .models import ShootNumbers
+from .models import FormInput
 
 class LottoForm(forms.ModelForm):
 
     class Meta:
-        model = ShootNumbers
+        model = FormInput
         fields = ('shooter', 'shot_count')

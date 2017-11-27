@@ -4,10 +4,95 @@ import numpy as np
 import random
 from statsmodels.tsa.arima_model import ARIMA
 
-# ShootNumets 번호예측 저장하는 모델, DecidedNumbers 로또번호 크롤링후 저장하는 모델
-from django.db.models import Max
-# from .models import DecidedNumbers
 from django.utils import timezone
+from .models import ShootNumbers, DecidedNumbers, FormInput
+# asynchronuous task
+from celery import task
+
+@task
+def generate():
+    # form input에서 받아온 shooter, shot_count값 추출함.
+    df = pd.DataFrame(list(FormInput.objects.values()))
+    df = df.sort_values(by='update_date', ascending=False)  # 날짜를 기준으로 내림차순으로 정렬
+    FrominputShooter = df.loc[0,'shooter']
+    FrominputShotCount = df.loc[0,'shot_count']
+
+    # 5밴드 2연속 7번, 4밴드 7연속 6번, 8,9연속 1번, 3밴드 4연속 5번, 2밴드 1연속만 있음.
+    df = pd.DataFrame(list(DecidedNumbers.objects.values('shotDate','band')))  # qury set를 dataframe으로 변환
+    df_band_ts = df.sort_values(by='shotDate', ascending=False)  # 날짜를 기준으로 내림차순으로 정렬
+    df_band_ts = df_band_ts.set_index('shotDate')
+
+    # print ('가장 최근 값:', df_band_ts.iloc[0])
+    band = 2
+    if (band == 2):
+        band_1st = 3
+        band_2nd = 4
+
+    for band in [band_1st,band_2nd]:
+        # ARIMA로 목표 값과 std값을 뽑아내기위해, df_total dataframe 만듬.
+        df_total = pd.DataFrame(list(DecidedNumbers.objects.values('shotDate','total', 'band')))  # qury set를 dataframe으로 변환
+        df_total = df_total.set_index('shotDate')
+        predict_total_value, predict_total_25, predict_total_75 = predict_nums(df_total, band)  #band별 ARIMA로 total값 예측
+
+        origin_nums = list()
+        except_nums = list()
+
+        if band == 3:
+            time_index = 25  # band=3 최근 50회중 나오지 않는 번호는 제외
+            df_band = pd.DataFrame(list(DecidedNumbers.objects.values\
+                      ('count','one','two','three','four','five','six','shotDate','total', 'band')))
+            nums = analysis(df_band, time_index, band)
+
+            for j in range(1,46):
+                if nums[j] != 0:
+                    origin_nums.append(j)
+                else:
+                    except_nums.append(j)
+
+        elif band == 4:
+            time_index = 25 # band=4 최근 25회중 나오지 않는 번호는 제외
+            df_band = pd.DataFrame(list(DecidedNumbers.objects.values\
+                      ('count','one','two','three','four','five','six','shotDate','total', 'band')))
+            nums = analysis(df_band, time_index, band)
+
+            for j in range(1,46):
+                if nums[j] != 0:
+                    origin_nums.append(j)
+                else:
+                    except_nums.append(j)
+
+        # 당첨번호 만들기위한 15개 번호 추출하기
+        n15 = 0  # 15개 버호추출을 위한 변수
+        count = 3  # 번호 조합 추출 횟수
+        origin15_nums = list()
+        while n15 < 14:
+            nums = shot(origin_nums, band, predict_total_value, predict_total_25, predict_total_75, count)
+            unique_elements, counts_elements = np.unique(nums, return_counts=True)
+            origin15_nums = unique_elements.tolist()
+            n15 = len(unique_elements)
+            count += 1  # 추첨 5개 조합으로 15개 이상 번호가 추출되지 않으면 조합을 1개씩 증가시킴
+
+        # 당첨번호 추출하기
+        # shot_count = 5 #Default값으로 5개 조합
+        lottos = shot(origin15_nums, band, predict_total_value, predict_total_25, predict_total_75, FrominputShotCount)
+        print ('lottos:',lottos)
+        # lotto_char = ""
+        # for lotto in lottos:
+        #    lotto_char = str(lotto) + '\n'
+
+        #ORM 저장
+        shootnumbers = ShootNumbers (
+            shooter = FrominputShooter,
+            shot_count = FrominputShotCount,
+            update_date = timezone.now(),
+            lottos = lottos,
+            predict_total_value = predict_total_value,
+            predict_total_25 = predict_total_25,
+            predict_total_75 = predict_total_75,
+            origin_nums = str(origin_nums),
+            except_nums = str(except_nums),
+            band = band)
+        shootnumbers.save()
 
 # ARIAM를 통한 total 번호 예측, 결과는 preditc num와 std값을 반환
 def predict_nums(df, band):
@@ -56,7 +141,8 @@ def analysis(df_band, time_index, band=3):
     return (lottoarray)
 
 # 각 조건에 맞게 arima predict nums와 except_nums를 포함하여 번호 조합을 만듬.
-def shot(origin_nums, targetBand, predict_total_value, predict_25, predict_75, shot_count, df_quantile):
+def shot(origin_nums, targetBand, predict_total_value, predict_25, predict_75, shot_count):
+    df_quantile = pd.DataFrame(list(DecidedNumbers.objects.values('shotDate','total', 'band')))  # qury set를 dataframe으로 변환
     quantile_max, quantile_min = quantile_analysis(df_quantile)  #분위수 max, min값 구함
     # numlist = set(numlist)
     winNumber = []

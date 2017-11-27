@@ -1,6 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
-# from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-
+from .tasks import generate
 # Create your views here.
 from .models import ShootNumbers
 from .forms import LottoForm
@@ -21,8 +20,9 @@ def post(request):
     if request.method == "POST":
         form = LottoForm(request.POST)
         if form.is_valid():
-            lotto = form.save(commit = False)
-            lotto.generate()
+            lotto = form.save()
+            # launch asynchronuous task
+            generate.delay()
             return redirect('index')
     else:
         form = LottoForm()

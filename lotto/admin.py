@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import ShootNumbers, DecidedNumbers
+from .models import ShootNumbers, DecidedNumbers, FormInput
 
 # Register your models here.
 @admin.register(ShootNumbers)
@@ -13,3 +13,5 @@ class DecidedNumbersAdmin(admin.ModelAdmin):
     list_display = ['count', 'shotDate', 'one', 'two', 'three','four','five','six', 'total', 'band']
     list_per_page = 20
     list_filter = ['band','count']
+
+admin.site.register(FormInput)
