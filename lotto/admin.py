@@ -14,4 +14,7 @@ class DecidedNumbersAdmin(admin.ModelAdmin):
     list_per_page = 20
     list_filter = ['band','count']
 
-admin.site.register(FormInput)
+@admin.register(FormInput)
+class FormInputAdmin(admin.ModelAdmin):
+    list_display = ['shooter', 'shot_count', 'update_date']
+    list_per_page = 20

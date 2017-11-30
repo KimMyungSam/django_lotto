@@ -1,5 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from .tasks import generate
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+
 # Create your views here.
 from .models import ShootNumbers
 from .forms import LottoForm
@@ -10,10 +12,23 @@ def index(request):
     return render(request, "lotto/default.html", {"lottos": lottos})
 
 def list(request):
+    object_list = ShootNumbers.objects.all()
+    paginator = Paginator(object_list, 4) # show per page
+
+    page = request.GET.get('page')
+    try:
+        lottos = paginator.page(page)
+    except PageNotAnInteger:
+        # If page is note an interger deliver the first page
+        lottos = paginator.page(1)
+    except EmptyPage:
+        # If page is out of range deliver last page of results
+        lottos = paginator.page(paginator.num_pages)
+
     if request.method == "POST":
         return redirect('index')
     else:
-        lottos = ShootNumbers.objects.all()
+        # lottos = ShootNumbers.objects.all()
         return render(request, "lotto/list.html", {"lottos": lottos})
 
 def post(request):

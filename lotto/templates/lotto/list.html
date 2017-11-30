@@ -5,12 +5,18 @@
 {% block content %}
   {% for lotto in lottos %}
     <h2><a href="{% url 'detail' lottokey=lotto.pk %}">{{lotto.shooter}}</a></h2>
-    <p> {{lotto.update_date}}</p>
-    <p> {{lotto.lottos|linebreaksbr}}</p>
+    <p>date:{{lotto.update_date}}</p>
+    <p>prediction numbers:<br>{{lotto.lottos|linebreaksbr}}</p>
+    <p>prediction band:{{lotto.band}}</p>
   {% endfor %}
 
+  <!-- Pagination -->
+  {% include "lotto/pagination.html" with page=lottos %}
+
+  <br> <br> <br>
   <form action="." method="post">
     {% csrf_token %}
-    <input type="submit" value="OK">
+    <input type="submit" value="Home">
   </form>
+
 {% endblock %}

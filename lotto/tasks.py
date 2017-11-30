@@ -13,9 +13,8 @@ from celery import task
 def generate():
     # form input에서 받아온 shooter, shot_count값 추출함.
     df = pd.DataFrame(list(FormInput.objects.values()))
-    df = df.sort_values(by='update_date', ascending=False)  # 날짜를 기준으로 내림차순으로 정렬
-    FrominputShooter = df.loc[0,'shooter']
-    FrominputShotCount = df.loc[0,'shot_count']
+    FrominputShooter = df['shooter'].iloc[-1] # shooter
+    FrominputShotCount = df['shot_count'].iloc[-1]  # shot_count
 
     # 5밴드 2연속 7번, 4밴드 7연속 6번, 8,9연속 1번, 3밴드 4연속 5번, 2밴드 1연속만 있음.
     df = pd.DataFrame(list(DecidedNumbers.objects.values('shotDate','band')))  # qury set를 dataframe으로 변환
@@ -75,17 +74,17 @@ def generate():
         # 당첨번호 추출하기
         # shot_count = 5 #Default값으로 5개 조합
         lottos = shot(origin15_nums, band, predict_total_value, predict_total_25, predict_total_75, FrominputShotCount)
-        print ('lottos:',lottos)
-        # lotto_char = ""
-        # for lotto in lottos:
-        #    lotto_char = str(lotto) + '\n'
+        # detail 페이지에서 조합별로 출력되도록 text로 변환함
+        lotto_str = ""
+        for lotto in lottos:
+            lotto_str += str(lotto)+'\n'
 
         #ORM 저장
         shootnumbers = ShootNumbers (
             shooter = FrominputShooter,
             shot_count = FrominputShotCount,
             update_date = timezone.now(),
-            lottos = lottos,
+            lottos = lotto_str,
             predict_total_value = predict_total_value,
             predict_total_25 = predict_total_25,
             predict_total_75 = predict_total_75,
@@ -144,7 +143,7 @@ def analysis(df_band, time_index, band=3):
 def shot(origin_nums, targetBand, predict_total_value, predict_25, predict_75, shot_count):
     df_quantile = pd.DataFrame(list(DecidedNumbers.objects.values('shotDate','total', 'band')))  # qury set를 dataframe으로 변환
     quantile_max, quantile_min = quantile_analysis(df_quantile)  #분위수 max, min값 구함
-    # numlist = set(numlist)
+
     winNumber = []
     gen_count = 0  #
     result = 0  # 난수 발생후 저장변수 0으로 초기화

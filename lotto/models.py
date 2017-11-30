@@ -4,6 +4,10 @@ import random
 import pandas as pd
 import numpy as np
 
+class PublishedManager(models.Manager):
+    def get_queryset(self):
+        return super(PublishedManager, self).get_queryset().filter(status='update_date')
+
 class FormInput(models.Model):
     shooter = models.CharField(max_length = 255)  # 추출할때 문구
     shot_count = models.IntegerField(default = 5)  # 추천할 조합 갯수
@@ -15,6 +19,10 @@ class FormInput(models.Model):
 
 # Create your models here.
 class ShootNumbers(models.Model):
+    # use a PublishedManager of pagination function
+    objects = models.Manager()  # The default Manager
+    updated_date = PublishedManager()  # Our custom manager.
+
     # lottos = models.CharField(max_length = 255, default = '[1,2,3,4,5,6]')
     lottos = models.TextField(default = '[1,2,3,4,5,6]')  # Guess번호를 저장하는 텍스트 필드
     shooter = models.CharField(max_length = 255)  # 추출할때 문구
