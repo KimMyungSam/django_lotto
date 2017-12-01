@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from .tasks import generate
+from .generate import generate
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 # Create your views here.
@@ -36,8 +36,8 @@ def post(request):
         form = LottoForm(request.POST)
         if form.is_valid():
             lotto = form.save()
-            # launch asynchronuous task
-            generate.delay()
+            # band별 번호 추출 함수 호출
+            generate()
             return redirect('index')
     else:
         form = LottoForm()
