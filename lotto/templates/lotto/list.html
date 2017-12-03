@@ -6,7 +6,7 @@
   {% for lotto in lottos %}
     <h2><a href="{% url 'detail' lottokey=lotto.pk %}">{{lotto.shooter}}</a></h2>
     <p>date:{{lotto.update_date}}</p>
-    <p>prediction numbers:<br>{{lotto.lottos|linebreaksbr}}</p>
+    <p>prediction numbers:<br>{{lotto.lottos|linenumbers|linebreaksbr}}</p>
     <p>prediction band:{{lotto.band}}</p>
   {% endfor %}
 

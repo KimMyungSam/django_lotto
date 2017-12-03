@@ -6,7 +6,7 @@ from statsmodels.tsa.arima_model import ARIMA
 from django.utils import timezone
 from .models import ShootNumbers, DecidedNumbers, FormInput
 # asynchronuous task
-from celery import task
+from celery import shared_task
 
 def generate():
     # 5밴드 2연속 7번, 4밴드 7연속 6번, 8,9연속 1번, 3밴드 4연속 5번, 2밴드 1연속만 있음.
@@ -20,7 +20,7 @@ def generate():
     # band4 ... launch asynchronuous task
     taskB4.delay()
 
-@app.task
+@shared_task
 def taskB3():
     band = 3
     df = pd.DataFrame(list(FormInput.objects.values()))
@@ -85,7 +85,7 @@ def taskB3():
         band = band)
     shootnumbers.save()
 
-@app.task
+@shared_task
 def taskB4():
     band = 4
     df = pd.DataFrame(list(FormInput.objects.values()))

@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from .generate import generate
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from .tasks import generate  # celery.py file imsport
 
 # Create your views here.
 from .models import ShootNumbers
@@ -15,6 +15,7 @@ def list(request):
     object_list = ShootNumbers.objects.all()
     paginator = Paginator(object_list, 4) # show per page
 
+    # pagination 처리
     page = request.GET.get('page')
     try:
         lottos = paginator.page(page)
@@ -25,6 +26,7 @@ def list(request):
         # If page is out of range deliver last page of results
         lottos = paginator.page(paginator.num_pages)
 
+    # POST Form 처리
     if request.method == "POST":
         return redirect('index')
     else:
@@ -37,7 +39,7 @@ def post(request):
         if form.is_valid():
             lotto = form.save()
             # band별 번호 추출 함수 호출
-            generate()
+            generate()  # tasks.py generate()
             return redirect('index')
     else:
         form = LottoForm()

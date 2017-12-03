@@ -124,29 +124,18 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
+# celery settings
+from kombu import Queue
+
 CELERY_BROKER_URL = 'amqp://localhost'
-CELERY_TIMEZONE = TIME_ZONE
-CELERY_ACCEPT_CONTENT = ['json', 'pickle']
-CELERY_TASK_RESULT_EXPIRES = 60  # 1 mins
-CELERYD_CONCURRENCY = 2
-CELERYD_MAX_TASKS_PER_CHILD = 4
-CELERYD_PREFETCH_MULTIPLIER = 1
-CELERY_DEFAULT_QUEUE = 'default'
-CELERY_DEFAULT_EXCHANGE_TYPE = 'topic'
-CELERY_DEFAULT_ROUTING_KEY = 'default'
 
 CELERY_QUEUES = (
-    Queue('default', Exchange('default'), routing_key='default'),
-    Queue('tasksB4', Exchange('tasksB4'), routing_key='tasksB4'),
-    Queue('tasksB3', Exchange('tasksB3'), routing_key='tasksB3'),
-)
+    # Queue('default', 'default', routing_key='default'),
+    Queue('taskB4', 'taskB4', routing_key='taskB4'),
+    Queue('taskB3', 'taskB3', routing_key='taskB3'),
+    )
+
 CELERY_ROUTES = {
-    'mysite.lotto.tasks.tasksB3': {
-        'queue': 'lone1st',
-        'routing_key': 'tasksB3',
-    },
-   'mysite.lotto.tasks.tasksB4': {
-        'queue': 'long2nd',
-        'routing_key': 'tasksB4'
+    'taskB4':{'queue':'taskB4','routing_key':'taskB4'},
+    'taskB3':{'queue':'taskB3','routing_key':'taskB3'},
    }
-}
