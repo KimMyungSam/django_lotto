@@ -1,3 +1,7 @@
+# asynchronuous task
+from __future__ import absolute_import, unicode_literals
+from celery import shared_task
+
 from pandas import pandas as pd
 import numpy as np
 import random
@@ -5,8 +9,6 @@ from statsmodels.tsa.arima_model import ARIMA
 
 from django.utils import timezone
 from .models import ShootNumbers, DecidedNumbers, FormInput
-# asynchronuous task
-from celery import shared_task
 
 def generate():
     # 5밴드 2연속 7번, 4밴드 7연속 6번, 8,9연속 1번, 3밴드 4연속 5번, 2밴드 1연속만 있음.
@@ -16,9 +18,9 @@ def generate():
     #df_band_ts = df_band_ts.set_index('shotDate')
 
     # band3 ... launch asynchronuous task
-    taskB3.delay()
+    taskB3.apply_async(queue='taskB3')
     # band4 ... launch asynchronuous task
-    taskB4.delay()
+    taskB4.apply_async(queue='taskB4')
 
 @shared_task
 def taskB3():
