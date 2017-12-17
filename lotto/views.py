@@ -12,6 +12,9 @@ def index(request):
     return render(request, "lotto/default.html", {"lottos": lottos})
 
 def list(request):
+    from django.conf import settings
+    print (settings.BASE_DIR)
+
     object_list = ShootNumbers.objects.all()
     paginator = Paginator(object_list, 4) # show per page
 

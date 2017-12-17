@@ -9,39 +9,10 @@
     <h2><p><a href="{% url 'list_lotto' %}">list</a></p></h2>
   </div>
 
-  To dream the impossible dream,<br>
-  To fight the unbeatable foe,<br>
-  To bear with unbearable sorrow,<br>
-  To run where the brave dare not go;
-  <br><br>
+  <div>
+    {% load static %}
+    <h1>Don Quixote</h1>
+    <img width="455.5" height="574.5" src="{% static '/donquixote.jpg'%}"/>
+  </div>
 
-  To right the unrightable wrong,<br>
-  To love pure and chaste from afar,<br>
-  To try when your arms are too weary,<br>
-  To reach the unreachable star;
-  <br><br>
-
-  This is my quest,<br>
-  To follow this star,<br>
-  No matter how hopeless,<br>
-  No matter how far.
-  <br><br>
-
-  To fight for the right,<br>
-  Without question or pause,<br>
-  To be willing to march into hell,<br>
-  For a heavenly cause.
-  <br><br>
-
-  And I know if I'll only be true,<br>
-  To this glorious quest,<br>
-  That my heart will lie peaceful and calm,<br>
-  When I’m laid to my rest.
-  <br><br>
-
-  And the world will be better for this,<br>
-  That one man, scorned and covered with scars,<br>
-  Still strove with his last ounce of courage,<br>
-  To reach the unreachable star.
-  <br><br>
 {% endblock %}
