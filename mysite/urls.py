@@ -20,8 +20,5 @@ from lotto import views
 urlpatterns = [
     url(r'^adminsam/', admin.site.urls),
     url(r'', include('lotto.urls')),
-    #url(r'^lotto/$', views.index, name='lotto'),
-    #url(r'^$', views.index, name='index'),
-    #url(r'^lotto/new/$', views.post, name = "new_lotto"),
-    #url(r'^lotto/(?P<lottokey>[0-9]+)/detail/$', views.detail, name='detail'),
+    url(r'^plusfriend/', include('plusfriend.urls')),
 ]
