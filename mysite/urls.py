@@ -20,5 +20,5 @@ from lotto import views
 urlpatterns = [
     url(r'^adminsam/', admin.site.urls),
     url(r'', include('lotto.urls')),
-    url(r'^plusfriend/', include('plusfriend.urls')),
+    url(r'^plusfriend/', include('plusfriend.urls', namespace='plusfriend')),
 ]
