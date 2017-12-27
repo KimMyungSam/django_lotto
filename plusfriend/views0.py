@@ -30,7 +30,6 @@ def on_message(request):
         post = Post.objects.create(user=request.user, message=content)
         response = 'Mr.{} saved your post.'.format(request.user.username)
 
-
     # plusfriend/melon search
     if content.startswith('melon:'):
         query = content[6:]
