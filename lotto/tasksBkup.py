@@ -39,61 +39,36 @@ def taskB3():
     df_total = df_total.set_index('shotDate')
     predict_total_value, predict_total_25, predict_total_75 = predict_nums(df_total, band)  #band별 ARIMA로 total값 예측
 
-
-
-    # band4 알고리즘
     origin_nums = list()
     except_nums = list()
-    '''
-    # 최소 제외수가 3개 미만이 되도록 time_index 값을 조정
 
-    time_index = 25 # band=4 최근 25회중 나오지 않는 번호는 제외
+    # band3 알고리즘
+    time_index = 25  # band=3 최근 50회중 나오지 않는 번호는 제외
     df_band = pd.DataFrame(list(DecidedNumbers.objects.values\
               ('count','one','two','three','four','five','six','shotDate','total', 'band')))
     nums = analysis(df_band, time_index, band)
-
 
     for j in range(1,46):
         if nums[j] != 0:
             origin_nums.append(j)
         else:
             except_nums.append(j)
-    '''
-    lottos = []  #추천 번호 저장 변수
 
-    for rangeMax in 31, 41, 46:
-        origin_nums = []
-        for i in range(1,rangeMax):
-            origin_nums.append(i)
+    # 당첨번호 만들기위한 15개 번호 추출하기
+    n15 = 0  # 15개 버호추출을 위한 변수
+    count = 3  # 번호 조합 추출 횟수
+    origin15_nums = list()
+    while n15 < 14:
+        nums = shot(origin_nums, band, predict_total_value, predict_total_25, predict_total_75, count)
+        unique_elements, counts_elements = np.unique(nums, return_counts=True)
+        origin15_nums = unique_elements.tolist()
+        n15 = len(unique_elements)
+        count += 1  # 추첨 5개 조합으로 15개 이상 번호가 추출되지 않으면 조합을 1개씩 증가시킴
 
-        # 당첨번호 만들기위한 15개 번호 추출하기
-        n15 = 0  # 15개 버호추출을 위한 변수
-        count = 3  # 번호 조합 추출 횟수
-        origin15_nums = list()
-
-        random_count = 18
-        while True:
-            while n15 < random_count:
-                nums = shot(origin_nums, band, predict_total_value, predict_total_25, predict_total_75, count, rangeMax)
-                unique_elements, counts_elements = np.unique(nums, return_counts=True)
-                origin15_nums = unique_elements.tolist()
-                n15 = len(unique_elements)
-                count += 1  # 추첨 5개 조합으로 15개 이상 번호가 추출되지 않으면 조합을 1개씩 증가시킴
-            if n15 == random_count:
-                break
-
-        # 당첨번호 추출하기
-        # shot_count = 5 #Default값으로 5개 조합
-        if rangeMax == 31:
-            count = 2
-        elif rangeMax == 41:
-            count = 2
-        elif rangeMax == 46:
-            count = 1
-        l = shot(origin15_nums, band, predict_total_value, predict_total_25, predict_total_75, count, rangeMax)
-        lottos.append(l)
-
-    # django detail 페이지에서 조합별로 출력되도록 text로 변환함
+    # 당첨번호 추출하기
+    # shot_count = 5 #Default값으로 5개 조합
+    lottos = shot(origin15_nums, band, predict_total_value, predict_total_25, predict_total_75, FrominputShotCount)
+    # detail 페이지에서 조합별로 출력되도록 text로 변환함
     lotto_str = ""
     for lotto in lottos:
         lotto_str += str(lotto)+'\n'
@@ -129,59 +104,36 @@ def taskB4():
     df_total = df_total.set_index('shotDate')
     predict_total_value, predict_total_25, predict_total_75 = predict_nums(df_total, band)  #band별 ARIMA로 total값 예측
 
-
-
-    # band4 알고리즘
     origin_nums = list()
     except_nums = list()
-    '''
-    # 최소 제외수가 3개 미만이 되도록 time_index 값을 조정
 
+    # band4 알고리즘
     time_index = 25 # band=4 최근 25회중 나오지 않는 번호는 제외
     df_band = pd.DataFrame(list(DecidedNumbers.objects.values\
               ('count','one','two','three','four','five','six','shotDate','total', 'band')))
     nums = analysis(df_band, time_index, band)
-
 
     for j in range(1,46):
         if nums[j] != 0:
             origin_nums.append(j)
         else:
             except_nums.append(j)
-    '''
-    lottos = []  #추천 번호 저장 변수
 
-    for rangeMax in 41, 46:
-        origin_nums = []
-        for i in range(1,rangeMax):
-            origin_nums.append(i)
+    # 당첨번호 만들기위한 15개 번호 추출하기
+    n15 = 0  # 15개 버호추출을 위한 변수
+    count = 3  # 번호 조합 추출 횟수
+    origin15_nums = list()
+    while n15 < 14:
+        nums = shot(origin_nums, band, predict_total_value, predict_total_25, predict_total_75, count)
+        unique_elements, counts_elements = np.unique(nums, return_counts=True)
+        origin15_nums = unique_elements.tolist()
+        n15 = len(unique_elements)
+        count += 1  # 추첨 5개 조합으로 15개 이상 번호가 추출되지 않으면 조합을 1개씩 증가시킴
 
-        # 당첨번호 만들기위한 15개 번호 추출하기
-        n15 = 0  # 15개 버호추출을 위한 변수
-        count = 3  # 번호 조합 추출 횟수
-        origin15_nums = list()
-
-        random_count = 18
-        while True:
-            while n15 < random_count:
-                nums = shot(origin_nums, band, predict_total_value, predict_total_25, predict_total_75, count, rangeMax)
-                unique_elements, counts_elements = np.unique(nums, return_counts=True)
-                origin15_nums = unique_elements.tolist()
-                n15 = len(unique_elements)
-                count += 1  # 추첨 5개 조합으로 15개 이상 번호가 추출되지 않으면 조합을 1개씩 증가시킴
-            if n15 == random_count:
-                break
-
-        # 당첨번호 추출하기
-        # shot_count = 5 #Default값으로 5개 조합
-        if rangeMax == 41:
-            count = 3
-        elif rangeMax == 46:
-            count = 2
-        l = shot(origin15_nums, band, predict_total_value, predict_total_25, predict_total_75, count, rangeMax)
-        lottos.append(l)
-
-    # django detail 페이지에서 조합별로 출력되도록 text로 변환함
+    # 당첨번호 추출하기
+    # shot_count = 5 #Default값으로 5개 조합
+    lottos = shot(origin15_nums, band, predict_total_value, predict_total_25, predict_total_75, FrominputShotCount)
+    # detail 페이지에서 조합별로 출력되도록 text로 변환함
     lotto_str = ""
     for lotto in lottos:
         lotto_str += str(lotto)+'\n'
@@ -247,7 +199,7 @@ def analysis(df_band, time_index, band=3):
     return (lottoarray)
 
 # 각 조건에 맞게 arima predict nums와 except_nums를 포함하여 번호 조합을 만듬.
-def shot(origin_nums, targetBand, predict_total_value, predict_25, predict_75, shot_count, rangeMax):
+def shot(origin_nums, targetBand, predict_total_value, predict_25, predict_75, shot_count):
     df_quantile = pd.DataFrame(list(DecidedNumbers.objects.values('shotDate','total', 'band')))  # qury set를 dataframe으로 변환
     quantile_max, quantile_min = quantile_analysis(df_quantile)  #분위수 max, min값 구함
 
@@ -271,22 +223,7 @@ def shot(origin_nums, targetBand, predict_total_value, predict_25, predict_75, s
         green = 0  # 31~40숫자 색
         gray = 0  # 41 ~ 45숫자 색
 
-        # 예측번호로 부터 6개 뽑아내기
-        # band=4이고 max 46일때 6자리 숫자가 31~40이면 제외함. 이는 max 45, 40일때 미출현 비율이 2배 차이가 남으로 이를 반영함
-        # band=3이고 max 41일때 6자리 숫자가 21~30이면 제외함. max 45일때 6자리 숫자가 21~40이면 제외함.
-        check_6digit = True
-        while check_6digit:
-            result = sorted(random.sample(origin_nums,6))
-            if targetBand == 4 and rangeMax == 46 and result[5] > 40:
-                check_6digit = False  # 조건을 만족하면 루프문 중단
-            elif targetBand == 4 and rangeMax == 41:  # 최소 조건은 양호 처리
-                check_6digit = False  # 조건을 만족하면 루프문 중단
-            elif targetBand == 3 and rangeMax == 41 and result[5] > 30:
-                check_6digit = False  # 조건을 만족하면 루프문 중단
-            elif targetBand == 3 and rangeMax == 46 and result[5] > 40:
-                check_6digit = False  # 조건을 만족하면 루프문 중단
-            elif targetBand == 3 and rangeMax == 31:  # 최소 조건은 양호 처리
-                check_6digit = False  # 조건을 만족하면 루프문 중단
+        result = sorted(random.sample(origin_nums,6))  # 예측번호로 부터 6개 뽑아내기
 
         # band 구분하기
         for i in range(0,6):
@@ -308,7 +245,6 @@ def shot(origin_nums, targetBand, predict_total_value, predict_25, predict_75, s
         if (green > 0): band += 1
         if (gray > 0):  band += 1
 
-        '''
         # 번호 6개의 sum 값 구하기
         total = sum(result[0:6])
 
@@ -332,9 +268,7 @@ def shot(origin_nums, targetBand, predict_total_value, predict_25, predict_75, s
                 even += 1
             elif  i%2 != 0:
                 odd += 1
-        '''
 
-        '''
         # 모든 조건을 검증후 번호 추출
         if targetBand == band:  # 3,4 밴드등 목표 밴드 확인
             if (total <= quantile_max) and (total >= quantile_min):  # 분위수 range외 제외
@@ -363,20 +297,8 @@ def shot(origin_nums, targetBand, predict_total_value, predict_25, predict_75, s
                 else:  drop2 += 1
             else:  drop3 += 1
         else:  drop4 += 1
-        '''
-        if targetBand == band:  # 3,4 밴드등 목표 밴드 확인
-            ConditionCount += 1
-            if ConditionCount > random.randint(100000,1000000):  #십만에서 백만중 하나 추출하여 count횟수가 그만큼 클때 인정
-                # 조합 건수 카운트
-                gen_count += 1
 
-                # 당첨번호
-                winNumber.append(result)
-
-                # 변수 초기화
-                ConditionCount = 0
-
-        if (gen_count > (shot_count -1)):  # 추출할 조합 수를 기준으로 while문 실행행
+        if (gen_count > (shot_count -1)):  # 추출한 조합 수를 기준으로 while문 실행행
             break
 
     return winNumber
