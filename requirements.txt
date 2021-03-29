@@ -18,7 +18,7 @@ olefile==0.44
 pandas==0.21.1
 patsy==0.4.1
 Pillow==4.3.0
-Pygments==2.2.0
+Pygments==2.7.4
 PyMySQL==0.7.11
 python-dateutil==2.6.1
 pytz==2017.3
